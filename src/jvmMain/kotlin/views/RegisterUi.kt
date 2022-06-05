@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
@@ -31,11 +32,10 @@ import java.awt.Cursor
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun LoginView(repository: UserRepository = UserRepository()) {
+fun RegisterView(repository: UserRepository = UserRepository()) {
     val username = remember { mutableStateOf("") }
+    val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
-    val mouseEvent = remember { mutableStateOf(false) }
-
     val scope = rememberCoroutineScope()
 
     Surface(
@@ -61,13 +61,12 @@ fun LoginView(repository: UserRepository = UserRepository()) {
                 value = username.value,
                 onValueChange = {
                     username.value = it
-                    println("email: $it")
                 },
                 shape = RoundedCornerShape(25),
                 modifier = Modifier.widthIn(min = 320.dp).height(50.dp),
                 placeholder = {
                     Text(
-                        "username", textAlign = TextAlign.Start
+                        "Username", textAlign = TextAlign.Start
                     )
                 },
                 leadingIcon = {
@@ -83,16 +82,38 @@ fun LoginView(repository: UserRepository = UserRepository()) {
 
             Spacer(modifier = Modifier.padding(vertical = 4.dp))
             TextField(
-                value = password.value,
+                value = email.value,
                 onValueChange = {
-                    password.value = it
-                    println("senha: $it")
+                    email.value = it
                 },
                 shape = RoundedCornerShape(25),
                 modifier = Modifier.widthIn(min = 320.dp).height(50.dp),
                 placeholder = {
                     Text(
-                        "password", textAlign = TextAlign.Start
+                        "Email", textAlign = TextAlign.Start
+                    )
+                },
+                leadingIcon = {
+                    Icon(imageVector = Icons.Default.Email, contentDescription = null)
+                },
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.White,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                maxLines = 1
+            )
+            Spacer(modifier = Modifier.padding(vertical = 6.dp))
+            TextField(
+                value = password.value,
+                onValueChange = {
+                    password.value = it
+                },
+                shape = RoundedCornerShape(25),
+                modifier = Modifier.widthIn(min = 320.dp).height(50.dp),
+                placeholder = {
+                    Text(
+                        "Password", textAlign = TextAlign.Start
                     )
                 },
                 leadingIcon = {
@@ -106,11 +127,12 @@ fun LoginView(repository: UserRepository = UserRepository()) {
                 ),
                 maxLines = 1
             )
-            Spacer(modifier = Modifier.padding(vertical = 6.dp))
+            Spacer(modifier = Modifier.padding(vertical = 8.dp))
+
             Button(
                 onClick = {
                     scope.launch(Dispatchers.Main) {
-                        repository.login(email = username.value, senha = username.value)
+                        repository.register(email = email.value, username = username.value, senha = username.value)
                     }
                 },
                 modifier = Modifier.pointerHoverIcon(icon = PointerIcon(cursor = Cursor(Cursor.HAND_CURSOR)))
