@@ -61,7 +61,6 @@ fun LoginView(repository: UserRepository = UserRepository()) {
                 value = username.value,
                 onValueChange = {
                     username.value = it
-                    println("email: $it")
                 },
                 shape = RoundedCornerShape(25),
                 modifier = Modifier.widthIn(min = 320.dp).height(50.dp),
@@ -86,7 +85,6 @@ fun LoginView(repository: UserRepository = UserRepository()) {
                 value = password.value,
                 onValueChange = {
                     password.value = it
-                    println("senha: $it")
                 },
                 shape = RoundedCornerShape(25),
                 modifier = Modifier.widthIn(min = 320.dp).height(50.dp),
@@ -110,7 +108,7 @@ fun LoginView(repository: UserRepository = UserRepository()) {
             Button(
                 onClick = {
                     scope.launch(Dispatchers.Main) {
-                        repository.login(email = username.value, senha = username.value)
+                        repository.login(email = username.value, senha = password.value)
                     }
                 },
                 modifier = Modifier.pointerHoverIcon(icon = PointerIcon(cursor = Cursor(Cursor.HAND_CURSOR)))

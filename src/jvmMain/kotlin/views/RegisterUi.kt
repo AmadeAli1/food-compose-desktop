@@ -25,7 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.Dispatchers
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogState
 import kotlinx.coroutines.launch
 import repository.UserRepository
 import java.awt.Cursor
@@ -131,8 +132,8 @@ fun RegisterView(repository: UserRepository = UserRepository()) {
 
             Button(
                 onClick = {
-                    scope.launch(Dispatchers.Main) {
-                        repository.register(email = email.value, username = username.value, senha = username.value)
+                    scope.launch {
+                        repository.register(email = email.value, username = username.value, senha = password.value)
                     }
                 },
                 modifier = Modifier.pointerHoverIcon(icon = PointerIcon(cursor = Cursor(Cursor.HAND_CURSOR)))
@@ -143,6 +144,16 @@ fun RegisterView(repository: UserRepository = UserRepository()) {
                 Text(
                     "Login", textAlign = TextAlign.Center, color = Color.White, fontWeight = FontWeight.SemiBold
                 )
+            }
+
+            Dialog(
+                state = DialogState(),
+                undecorated = true,
+                resizable = false,
+                visible = repository.register.value.isNotBlank(), onCloseRequest = {
+                    repository.register.value = ""
+                }) {
+                Text(text = repository.register.value)
             }
 
             AnimatedVisibility(visible = repository.loginState.value) {
