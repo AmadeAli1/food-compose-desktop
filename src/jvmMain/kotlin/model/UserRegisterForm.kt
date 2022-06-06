@@ -5,9 +5,6 @@ data class UserRegisterForm(
     var senha: String,
     var email: String,
 ) {
-
-
     constructor() : this("", "", "") {}
-
 
 }

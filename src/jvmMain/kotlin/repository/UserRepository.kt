@@ -57,26 +57,34 @@ class UserRepository {
         withContext(Dispatchers.IO) {
             try {
                 loginState.value = true
+
                 val user = UserRegisterForm(name = username, senha = senha, email = email)
+
                 val response = service.signup(user = user)
+
                 if (response.isSuccessful) {
                     loginState.value = false
                     println(response.body()!!.toString())
                 } else {
                     loginState.value = false
                     val message = response.errorBody()!!.string()
-                    val js = JsonParser().parse(message)
+                    try {
+                        val js = JsonParser().parse(message)
 
-                    val erros = js.asJsonArray.map {
-                        val field = it.asJsonObject.get("field")
-                        val message = it.asJsonObject.get("message")
-                        ErrorBody(field.asString, message.asString)
+                        val erros = js.asJsonArray.map {
+                            val field = it.asJsonObject.get("field")
+                            val message = it.asJsonObject.get("message")
+                            ErrorBody(field.asString, message.asString)
+                        }
+                        println(erros)
+
+                    } catch (e: Exception) {
+                        println("Json Parser Error: ")
+                        println(e.message)
                     }
 
-                    println(erros)
-
                 }
-            } catch (e: HttpException) {
+            } catch (e: Exception) {
                 loginState.value = false
                 println("Erro: ${e.message}")
             }
