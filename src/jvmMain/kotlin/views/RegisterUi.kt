@@ -3,6 +3,7 @@ package views
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.Surface
@@ -42,74 +43,82 @@ fun RegisterView(repository: UserRepository = UserRepository()) {
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = Color.LightGray
+        color = Color.Gray
     ) {
 
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Surface(
+                color = Color.LightGray, elevation = 10.dp, shape = RoundedCornerShape(5),
+                modifier = Modifier.size(width = 360.dp, 450.dp)
+            ) {
+                Column(
+                    modifier = Modifier.width(320.dp).height(450.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
 
-            Icon(
-                imageVector = Icons.Default.AccountCircle,
-                contentDescription = null,
-                tint = Color.DarkGray,
-                modifier = Modifier.size(120.dp).clip(CircleShape)
-            )
+                    Icon(
+                        imageVector = Icons.Default.AccountCircle,
+                        contentDescription = null,
+                        tint = Color.DarkGray,
+                        modifier = Modifier.size(120.dp).clip(CircleShape)
+                    )
 
-            Spacer(modifier = Modifier.padding(vertical = 6.dp))
+                    Spacer(modifier = Modifier.padding(vertical = 6.dp))
 
-            EditText(modifier = Modifier.widthIn(min = 320.dp).height(50.dp),
-                value = email,
-                label = "Email",
-                icon = Icons.Outlined.Email,
-                onTextChange = {}
-            )
+                    EditText(modifier = Modifier.widthIn(min = 320.dp).height(50.dp),
+                        value = email,
+                        label = "Email",
+                        icon = Icons.Outlined.Email,
+                        onTextChange = {}
+                    )
 
-            Spacer(modifier = Modifier.padding(vertical = 4.dp))
+                    Spacer(modifier = Modifier.padding(vertical = 4.dp))
 
-            EditText(
-                modifier = Modifier.widthIn(min = 320.dp).height(50.dp),
-                value = username,
-                label = "Username",
-                icon = Icons.Outlined.Person,
-                onTextChange = {}
-            )
+                    EditText(
+                        modifier = Modifier.widthIn(min = 320.dp).height(50.dp),
+                        value = username,
+                        label = "Username",
+                        icon = Icons.Outlined.Person,
+                        onTextChange = {}
+                    )
 
-            Spacer(modifier = Modifier.padding(vertical = 4.dp))
+                    Spacer(modifier = Modifier.padding(vertical = 4.dp))
 
-            EditText(
-                modifier = Modifier.widthIn(min = 320.dp).height(50.dp),
-                value = password,
-                label = "Password",
-                icon = Icons.Outlined.Lock,
-                onTextChange = {},
-                visualTransformation = PasswordVisualTransformation()
-            )
+                    EditText(
+                        modifier = Modifier.widthIn(min = 320.dp).height(50.dp),
+                        value = password,
+                        label = "Password",
+                        icon = Icons.Outlined.Lock,
+                        onTextChange = {},
+                        visualTransformation = PasswordVisualTransformation()
+                    )
 
-            Spacer(modifier = Modifier.padding(vertical = 8.dp))
+                    Spacer(modifier = Modifier.padding(vertical = 8.dp))
 
-            ButtonForm("Register", onClick = {
-                scope.launch {
-                    repository.signup(email = email.value, senha = password.value, username = username.value)
+                    ButtonForm("Register", onClick = {
+                        scope.launch {
+                            repository.signup(email = email.value, senha = password.value, username = username.value)
+                        }
+                    })
+
+                    Dialog(
+                        state = DialogState(position = WindowPosition(Alignment.Center), size = DpSize(100.dp, 50.dp)),
+                        undecorated = true,
+                        resizable = false,
+                        visible = repository.register.value.isNotBlank(), onCloseRequest = {
+                            repository.register.value = ""
+                        }) {
+                        Text(text = repository.register.value)
+                    }
+
+                    AnimatedVisibility(visible = repository.loginState.value) {
+                        CircularProgressIndicator()
+                    }
                 }
-            })
-
-            Dialog(
-                state = DialogState(position = WindowPosition(Alignment.Center), size = DpSize(100.dp, 50.dp)),
-                undecorated = true,
-                resizable = false,
-                visible = repository.register.value.isNotBlank(), onCloseRequest = {
-                    repository.register.value = ""
-                }) {
-                Text(text = repository.register.value)
-            }
-
-            AnimatedVisibility(visible = repository.loginState.value) {
-                CircularProgressIndicator()
             }
         }
+
     }
 
 
