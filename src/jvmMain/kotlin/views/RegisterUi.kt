@@ -3,13 +3,15 @@ package views
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,17 +21,16 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogState
+import androidx.compose.ui.window.WindowPosition
+import components.ButtonForm
+import components.EditText
 import kotlinx.coroutines.launch
 import repository.UserRepository
-import java.awt.Cursor
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -40,7 +41,8 @@ fun RegisterView(repository: UserRepository = UserRepository()) {
     val scope = rememberCoroutineScope()
 
     Surface(
-        modifier = Modifier.fillMaxSize(), color = Color.LightGray
+        modifier = Modifier.fillMaxSize(),
+        color = Color.LightGray
     ) {
 
         Column(
@@ -58,96 +60,44 @@ fun RegisterView(repository: UserRepository = UserRepository()) {
 
             Spacer(modifier = Modifier.padding(vertical = 6.dp))
 
-            TextField(
-                value = username.value,
-                onValueChange = {
-                    username.value = it
-                },
-                shape = RoundedCornerShape(25),
-                modifier = Modifier.widthIn(min = 320.dp).height(50.dp),
-                placeholder = {
-                    Text(
-                        "Username", textAlign = TextAlign.Start
-                    )
-                },
-                leadingIcon = {
-                    Icon(imageVector = Icons.Default.Person, contentDescription = null)
-                },
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.White,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                maxLines = 1
+            EditText(modifier = Modifier.widthIn(min = 320.dp).height(50.dp),
+                value = email,
+                label = "Email",
+                icon = Icons.Outlined.Email,
+                onTextChange = {}
             )
 
             Spacer(modifier = Modifier.padding(vertical = 4.dp))
-            TextField(
-                value = email.value,
-                onValueChange = {
-                    email.value = it
-                },
-                shape = RoundedCornerShape(25),
+
+            EditText(
                 modifier = Modifier.widthIn(min = 320.dp).height(50.dp),
-                placeholder = {
-                    Text(
-                        "Email", textAlign = TextAlign.Start
-                    )
-                },
-                leadingIcon = {
-                    Icon(imageVector = Icons.Default.Email, contentDescription = null)
-                },
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.White,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                maxLines = 1
+                value = username,
+                label = "Username",
+                icon = Icons.Outlined.Person,
+                onTextChange = {}
             )
-            Spacer(modifier = Modifier.padding(vertical = 6.dp))
-            TextField(
-                value = password.value,
-                onValueChange = {
-                    password.value = it
-                },
-                shape = RoundedCornerShape(25),
+
+            Spacer(modifier = Modifier.padding(vertical = 4.dp))
+
+            EditText(
                 modifier = Modifier.widthIn(min = 320.dp).height(50.dp),
-                placeholder = {
-                    Text(
-                        "Password", textAlign = TextAlign.Start
-                    )
-                },
-                leadingIcon = {
-                    Icon(imageVector = Icons.Default.Lock, contentDescription = null)
-                },
-                visualTransformation = PasswordVisualTransformation(),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.White,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                maxLines = 1
+                value = password,
+                label = "Password",
+                icon = Icons.Outlined.Lock,
+                onTextChange = {},
+                visualTransformation = PasswordVisualTransformation()
             )
+
             Spacer(modifier = Modifier.padding(vertical = 8.dp))
 
-            Button(
-                onClick = {
-                    scope.launch {
-                        repository.register(email = email.value, username = username.value, senha = password.value)
-                    }
-                },
-                modifier = Modifier.pointerHoverIcon(icon = PointerIcon(cursor = Cursor(Cursor.HAND_CURSOR)))
-                    .widthIn(min = 320.dp),
-                shape = RoundedCornerShape(25),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.DarkGray)
-            ) {
-                Text(
-                    "Login", textAlign = TextAlign.Center, color = Color.White, fontWeight = FontWeight.SemiBold
-                )
-            }
+            ButtonForm("Register", onClick = {
+                scope.launch {
+                    repository.signup(email = email.value, senha = password.value, username = username.value)
+                }
+            })
 
             Dialog(
-                state = DialogState(),
+                state = DialogState(position = WindowPosition(Alignment.Center), size = DpSize(100.dp, 50.dp)),
                 undecorated = true,
                 resizable = false,
                 visible = repository.register.value.isNotBlank(), onCloseRequest = {
@@ -161,5 +111,6 @@ fun RegisterView(repository: UserRepository = UserRepository()) {
             }
         }
     }
+
 
 }
