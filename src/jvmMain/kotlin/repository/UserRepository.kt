@@ -1,83 +1,89 @@
 package repository
 
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import model.UserRegisterForm
-import model.Usuario
-import retrofit2.Call
-import retrofit2.Callback
 import retrofit2.HttpException
-import retrofit2.Response
-import utils.ErrorBody
 import utils.RetrofitInstance
 
 
-class UserRepository {
+class UserRepository private constructor() {
     private val retrofit = RetrofitInstance.getINSTANCE()!!
     private val service = retrofit.create(UserService::class.java)
     val loginState = mutableStateOf(false)
     val register = mutableStateOf("")
+    val validateForm = mutableStateMapOf<String, String>()
 
-    fun login(email: String, senha: String) {
+    init {
+        initValidate()
+    }
+
+    private fun initValidate() {
+        validateForm["email"] = ""
+        validateForm["name"] = ""
+        validateForm["senha"] = ""
+
+    }
+
+    suspend fun login(email: String, senha: String): Boolean {
         loginState.value = true
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = service.login(email = email, senha = senha)
+                try {
+                    if (response.isSuccessful) {
+                        loginState.value = false
+                        println(response.body()!!)
+                        return@withContext true
+                    } else {
+                        println("--------Erro-----------")
+                        println(response.errorBody()!!.string())
+                        println(response.message())
+                        loginState.value = false
 
-        try {
-            service.login(email = email, senha = senha).enqueue(object : Callback<Usuario> {
-                override fun onResponse(call: Call<Usuario>, response: Response<Usuario>) {
-                    try {
-                        if (response.isSuccessful) {
-                            loginState.value = false
-                            println(response.body()!!)
-                        } else {
-                            println("--------Erro-----------")
-                            println(response.errorBody()!!.string())
-                            println(response.message())
-                            loginState.value = false
-                        }
-                    } catch (e: Exception) {
-                        println(e.message)
                     }
+                } catch (e: Exception) {
+                    println(e.message)
                 }
 
-                override fun onFailure(call: Call<Usuario>, t: Throwable) {
-                    loginState.value = false
-                    t.printStackTrace()
-                }
-            })
-        } catch (e: HttpException) {
-            loginState.value = false
-            e.printStackTrace()
+
+            } catch (e: HttpException) {
+                loginState.value = false
+                e.printStackTrace()
+            }
+            false
         }
 
     }
 
-    suspend fun signup(email: String, username: String, senha: String) {
-        withContext(Dispatchers.IO) {
+    suspend fun signup(email: String, username: String, senha: String): Boolean {
+        return withContext(Dispatchers.IO) {
             try {
                 loginState.value = true
-
                 val user = UserRegisterForm(name = username, senha = senha, email = email)
-
                 val response = service.signup(user = user)
 
                 if (response.isSuccessful) {
                     loginState.value = false
+                    initValidate()
                     println(response.body()!!.toString())
+                    return@withContext true
                 } else {
                     loginState.value = false
                     val message = response.errorBody()!!.string()
                     try {
                         val js = JsonParser().parse(message)
-
-                        val erros = js.asJsonArray.map {
+                        initValidate()
+                        val xs = mutableMapOf<String, String>()
+                        js.asJsonArray.forEach {
                             val field = it.asJsonObject.get("field")
-                            val message = it.asJsonObject.get("message")
-                            ErrorBody(field.asString, message.asString)
+                            val msg = it.asJsonObject.get("message")
+                            xs[field.asString] = msg.asString
                         }
-                        println(erros)
-
+                        validateForm.putAll(xs)
                     } catch (e: Exception) {
                         println("Json Parser Error: ")
                         println(e.message)
@@ -88,34 +94,23 @@ class UserRepository {
                 loginState.value = false
                 println("Erro: ${e.message}")
             }
+            return@withContext false
         }
     }
 
-    fun register(email: String, username: String, senha: String) {
-        loginState.value = true
-        val user = UserRegisterForm(name = username, senha = senha, email = email)
-        println(user)
-        try {
-            service.register(user).enqueue(object : Callback<Usuario> {
-                override fun onResponse(call: Call<Usuario>, response: Response<Usuario>) {
-                    if (response.isSuccessful) {
-                        loginState.value = false
-                        val us = response.body()!!
-                        register.value = "Welcome ${us.getUsername()}"
-                    } else {
-                        loginState.value = false
-                        println(response.errorBody()!!.string())
-                    }
-                }
+    companion object {
+        @Volatile
+        private var INSTANCE: UserRepository? = null
 
-                override fun onFailure(call: Call<Usuario>, t: Throwable) {
-                    t.printStackTrace()
-                }
-            })
-        } catch (e: HttpException) {
-            e.printStackTrace()
-            loginState.value = false
+        @Synchronized
+        fun getINSTANCE(): UserRepository? {
+            if (INSTANCE == null) {
+                INSTANCE = UserRepository()
+                return INSTANCE
+            }
+            return INSTANCE
         }
     }
 
 }
+

@@ -7,14 +7,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -24,24 +23,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import components.EditText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import repository.UserRepository
 import java.awt.Cursor
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun LoginView(repository: UserRepository = UserRepository()) {
+fun LoginView(onSuccessLogin: (Screen) -> Unit) {
+    val repository = UserRepository.getINSTANCE()!!
+
     val username = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
-    val mouseEvent = remember { mutableStateOf(false) }
-
     val scope = rememberCoroutineScope()
 
     Surface(
-        modifier = Modifier.fillMaxSize(), color = Color.LightGray
+        modifier = Modifier.fillMaxSize(),
+        color = Color.LightGray
     ) {
-
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
@@ -57,58 +56,33 @@ fun LoginView(repository: UserRepository = UserRepository()) {
 
             Spacer(modifier = Modifier.padding(vertical = 6.dp))
 
-            TextField(
-                value = username.value,
-                onValueChange = {
-                    username.value = it
-                },
-                shape = RoundedCornerShape(25),
+            EditText(
                 modifier = Modifier.widthIn(min = 320.dp).height(50.dp),
-                placeholder = {
-                    Text(
-                        "username", textAlign = TextAlign.Start
-                    )
-                },
-                leadingIcon = {
-                    Icon(imageVector = Icons.Default.Person, contentDescription = null)
-                },
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.White,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                maxLines = 1
+                value = username,
+                label = "Username",
+                icon = Icons.Outlined.Person,
+                onTextChange = {},
+                validation = ""
             )
-
             Spacer(modifier = Modifier.padding(vertical = 4.dp))
-            TextField(
-                value = password.value,
-                onValueChange = {
-                    password.value = it
-                },
-                shape = RoundedCornerShape(25),
+
+            EditText(
                 modifier = Modifier.widthIn(min = 320.dp).height(50.dp),
-                placeholder = {
-                    Text(
-                        "password", textAlign = TextAlign.Start
-                    )
-                },
-                leadingIcon = {
-                    Icon(imageVector = Icons.Default.Lock, contentDescription = null)
-                },
-                visualTransformation = PasswordVisualTransformation(),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.White,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                maxLines = 1
+                value = password,
+                label = "Password",
+                icon = Icons.Outlined.Lock,
+                onTextChange = {},
+                validation = "",
+                visualTransformation = PasswordVisualTransformation()
             )
             Spacer(modifier = Modifier.padding(vertical = 6.dp))
             Button(
                 onClick = {
                     scope.launch(Dispatchers.Main) {
-                        repository.login(email = username.value, senha = password.value)
+                        val login = repository.login(email = username.value, senha = password.value)
+                        if (login) {
+                            onSuccessLogin(Screen.Home)
+                        }
                     }
                 },
                 modifier = Modifier.pointerHoverIcon(icon = PointerIcon(cursor = Cursor(Cursor.HAND_CURSOR)))

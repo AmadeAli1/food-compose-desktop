@@ -1,10 +1,13 @@
 package components
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -24,31 +27,43 @@ fun EditText(
     icon: ImageVector,
     onTextChange: (String) -> Unit,
     visualTransformation: VisualTransformation = VisualTransformation.None,
+    validation: String?,
 ) {
-    TextField(
-        value = value.value,
-        onValueChange = {
-            value.value = it
-            onTextChange(it)
-        },
-        shape = RoundedCornerShape(25),
-        modifier = modifier,
-        placeholder = {
+    Column(modifier = Modifier) {
+        TextField(
+            value = value.value,
+            onValueChange = {
+                value.value = it
+                onTextChange(it)
+            },
+            shape = RoundedCornerShape(25),
+            modifier = modifier,
+            placeholder = {
+                Text(
+                    label, textAlign = TextAlign.Start
+                )
+            },
+            leadingIcon = {
+                Icon(imageVector = icon, contentDescription = null)
+            },
+            visualTransformation = visualTransformation,
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = Color.White,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+            maxLines = 1
+        )
+        if (validation!!.isNotBlank()) {
             Text(
-                label, textAlign = TextAlign.Start
+                text = validation,
+                maxLines = 1,
+                color = Color.Red,
+                style = MaterialTheme.typography.body2,
+                modifier = Modifier.align(Alignment.End).padding(top = 2.dp)
             )
-        },
-        leadingIcon = {
-            Icon(imageVector = icon, contentDescription = null)
-        },
-        visualTransformation = visualTransformation,
-        colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = Color.White,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
-        ),
-        maxLines = 1
-    )
+        }
+    }
 }
 
 @Composable
