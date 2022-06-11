@@ -4,13 +4,15 @@ import com.google.gson.annotations.SerializedName
 
 data class Usuario(
     @SerializedName("uid")
-    private var uid: String? = null,
+    val uid: String,
     @SerializedName("email")
-    private var email: String? = null,
+    val email: String,
     @SerializedName("username")
-    val username: String? = null,
+    val username: String,
     @SerializedName("isEnable")
-    val isEnable: Boolean? = null,
+    val isEnable: Boolean,
+    @SerializedName("imageUrl")
+    val profileUrl: String? = null,
 ) {
-    constructor() : this("", "", "", null)
+    constructor() : this("", "", "", false,null)
 }

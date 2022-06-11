@@ -28,6 +28,8 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 implementation("com.squareup.retrofit2:retrofit:2.9.0")
                 implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+                implementation("io.ktor:ktor-client-core:2.0.2")
+                implementation("org.jetbrains.compose.material:material-icons-extended-desktop:1.0.0")
             }
         }
         val jvmTest by getting

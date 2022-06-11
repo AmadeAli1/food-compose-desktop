@@ -6,6 +6,7 @@ import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import model.UserRegisterForm
+import model.Usuario
 import retrofit2.HttpException
 import utils.RetrofitInstance
 
@@ -13,8 +14,8 @@ import utils.RetrofitInstance
 class UserRepository private constructor() {
     private val retrofit = RetrofitInstance.getINSTANCE()!!
     private val service = retrofit.create(UserService::class.java)
+    val currentUser = mutableStateOf(Usuario())
     val loginState = mutableStateOf(false)
-    val register = mutableStateOf("")
     val validateForm = mutableStateMapOf<String, String>()
 
     init {
@@ -25,6 +26,18 @@ class UserRepository private constructor() {
         validateForm["email"] = ""
         validateForm["name"] = ""
         validateForm["senha"] = ""
+    }
+
+    suspend fun users() = withContext(Dispatchers.IO) {
+        val response = service.allUsers()
+
+        if (response.isSuccessful) {
+            return@withContext response.body()
+        } else {
+            println("In")
+            println(response.message())
+            emptyList<Usuario>()
+        }
 
     }
 
@@ -36,7 +49,7 @@ class UserRepository private constructor() {
                 try {
                     if (response.isSuccessful) {
                         loginState.value = false
-                        println(response.body()!!)
+                        currentUser.value = response.body()!!
                         return@withContext true
                     } else {
                         println("--------Erro-----------")

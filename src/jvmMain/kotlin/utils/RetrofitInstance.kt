@@ -20,7 +20,7 @@ class RetrofitInstance {
                         OkHttpClient.Builder()
                             .callTimeout(Duration.ofMinutes(3L))
                             .connectTimeout(Duration.ofMinutes(3L))
-                            .readTimeout(Duration.ofMinutes(1L)).build()
+                            .readTimeout(Duration.ofMinutes(3L)).build()
                     )
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()

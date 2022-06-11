@@ -6,16 +6,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.window.*
-import views.HomeView
-import views.LoginView
-import views.RegisterView
-import views.Screen
+import views.*
 
 fun main() = application {
 
     val state = rememberWindowState(
         position = WindowPosition(Alignment.Center),
-        placement = WindowPlacement.Maximized
+       // placement = WindowPlacement.Maximized
     )
 
     val page = remember { mutableStateOf(Screen.Login) }
@@ -28,7 +25,7 @@ fun main() = application {
     ) {
         MaterialTheme {
             when (page.value) {
-                Screen.Home -> HomeView()
+                Screen.Home -> Demo()
                 Screen.Login -> LoginView{
                     page.value = it
                 }

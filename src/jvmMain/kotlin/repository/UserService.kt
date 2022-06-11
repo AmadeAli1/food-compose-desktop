@@ -7,11 +7,16 @@ import retrofit2.http.*
 
 interface UserService {
 
-    @GET("login")
+    @Headers("Accept: application/json")
+    @GET("user/login")
     suspend fun login(@Query("email") email: String, @Query("senha") senha: String): Response<Usuario>
 
+    //@Headers("Accept: application/json")
+    @GET("user/all")
+    suspend fun allUsers(): Response<List<Usuario>>
+
     @Headers("Accept: application/json")
-    @POST("register")
+    @POST("user/register")
     suspend fun signup(@Body user: UserRegisterForm): Response<Usuario>
 
 }
