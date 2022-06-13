@@ -1,8 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="Compose-Desktop-First-jvm-1.0-SNAPSHOT">
     <output-path>$PROJECT_DIR$/build/libs</output-path>
-    <root id="archive" name="Compose-Desktop-First-jvm-1.0-SNAPSHOT.jar">
-      <element id="module-output" name="Compose-Desktop-First.jvmMain" />
-    </root>
+    <root id="archive" name="Compose-Desktop-First-jvm-1.0-SNAPSHOT.jar" />
   </artifact>
 </component>

@@ -12,7 +12,7 @@ fun main() = application {
 
     val state = rememberWindowState(
         position = WindowPosition(Alignment.Center),
-       // placement = WindowPlacement.Maximized
+        placement = WindowPlacement.Fullscreen
     )
 
     val page = remember { mutableStateOf(Screen.Login) }

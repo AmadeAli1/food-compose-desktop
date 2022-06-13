@@ -2,18 +2,20 @@ package views
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material.icons.outlined.PersonOutline
-import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material.icons.filled.BabyChangingStation
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -22,17 +24,21 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import components.UserCard
 import components.loadNetworkImage
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOf
 import model.Usuario
+import org.jetbrains.skiko.redrawer.MainUIDispatcher
 import repository.UserRepository
 import theme.lightPalete
 import java.awt.Cursor
+import java.io.File
 
 @Composable
 fun HomeView(repository: UserRepository = UserRepository.getINSTANCE()!!) {
@@ -123,12 +129,12 @@ fun Demo() {
                         when (currentScreen) {
                             ScreenNavRail.MAIN -> Main()
                             ScreenNavRail.USERS -> Users()
-                            ScreenNavRail.PRODUCTS -> Main()
+                            ScreenNavRail.PRODUCTS -> Products()
                         }
                         if (showImage) {
                             Surface(
                                 elevation = 5.dp,
-                                shape=CircleShape,
+                                shape = CircleShape,
                                 modifier = Modifier.align(Alignment.Center)
                             ) {
                                 Image(
@@ -154,6 +160,107 @@ fun Main() {
         modifier = Modifier.fillMaxSize()
     )
 }
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun Products() {
+    val text = remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+    val list = remember { mutableStateListOf<Int>() }
+
+    LaunchedEffect(true) {
+        withContext(Dispatchers.Default){
+            flowOf(1,
+                2,
+                3,
+                4,
+                5,
+                4,
+                5,
+                6,
+                7,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                0)
+                .collect {
+                    list.add(it)
+                }
+        }
+    }
+
+
+    Column(modifier = Modifier.fillMaxSize()){
+        SearchBar(text)
+        LazyVerticalGrid(cells = GridCells.Adaptive(140.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp),
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
+            modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+
+            items(items = list) { item ->
+                ProdutoCard(item.toString())
+            }
+        }
+    }
+}
+
+@Composable
+private fun SearchBar(text: MutableState<String>) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        TextField(
+            value = text.value,
+            onValueChange = {
+                text.value = it
+            },
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = MaterialTheme.colors.onBackground,
+                unfocusedIndicatorColor = Color.Transparent,
+                unfocusedLabelColor = Color.Transparent
+            ),
+            modifier = Modifier.weight(8f).padding(16.dp),
+            shape = RoundedCornerShape(5),
+            placeholder = { Text(text = "Search") },
+            trailingIcon = {
+                IconButton(onClick = {},
+                    modifier = Modifier.pointerHoverIcon(icon = PointerIcon(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)))) {
+                    Icon(imageVector = Icons.Outlined.Search,
+                        contentDescription = null)
+                }
+            }
+        )
+        OutlinedButton(onClick = {}, modifier = Modifier.padding(horizontal = 10.dp).height(50.dp)) {
+            Icon(imageVector = Icons.Outlined.AddShoppingCart,
+                contentDescription = null)
+            Text("Add Product", style = MaterialTheme.typography.body1)
+        }
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun ProdutoCard(text: String) {
+    Card(
+        backgroundColor = Color.White,
+        elevation = 5.dp,
+        shape = RoundedCornerShape(5)
+    ) {
+        Column(modifier = Modifier.width(140.dp)) {
+            Image(imageVector = Icons.Filled.BabyChangingStation,
+                contentDescription = null,
+                modifier = Modifier.width(240.dp).height(220.dp).padding(8.dp),
+                contentScale = ContentScale.Crop
+            )
+            Row {
+                Text("T-Shirt", modifier = Modifier.weight(1f))
+                Text("${text}00.MT", modifier = Modifier.weight(1f))
+            }
+        }
+    }
+}
+
 
 @Composable
 fun Users() {
@@ -226,21 +333,6 @@ private fun ScrollableColumn(content: @Composable () -> Unit) {
         }
         VerticalScrollbar(adapter = adapter, modifier = Modifier.fillMaxHeight().align(Alignment.TopEnd))
     }
-}
-
-
-@Composable
-fun RowScope.TableCell(
-    text: String,
-    weight: Float,
-) {
-    Text(
-        text = text,
-        Modifier
-            .border(1.dp, Color.Black)
-            .weight(weight)
-            .padding(8.dp)
-    )
 }
 
 data class NavItems(
