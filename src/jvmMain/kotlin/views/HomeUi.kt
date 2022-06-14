@@ -1,10 +1,9 @@
 package views
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -21,55 +20,14 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import components.ScrollableColumn
-import components.UserCard
 import components.loadNetworkImage
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import model.Usuario
 import repository.UserRepository
 import theme.lightPalete
 import utils.Utils
 import java.awt.Cursor
-
-@Composable
-fun HomeView(repository: UserRepository = UserRepository.getINSTANCE()!!) {
-    val scope = rememberCoroutineScope()
-    val lazyState = rememberLazyListState()
-    val scrollState = rememberScrollState(0)
-    val scroll = rememberScrollbarAdapter(scrollState)
-    val list = mutableStateListOf<Usuario>()
-
-    scope.launch {
-        val users = repository.users()
-        //list.addAll(users!!)
-    }
-
-    Surface(modifier = Modifier.fillMaxSize()) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Box(modifier = Modifier.verticalScroll(state = scrollState)) {
-                Column(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Column(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        list.forEach {
-                            UserCard(modifier = Modifier.width(300.dp).height(300.dp), it)
-                        }
-                    }
-                }
-            }
-
-            VerticalScrollbar(adapter = scroll, modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd))
-        }
-
-    }
-
-}
 
 @Composable
 fun Demo() {
@@ -132,7 +90,7 @@ fun Demo() {
                                 shape = CircleShape,
                                 modifier = Modifier.align(Alignment.Center)
                             ) {
-                                ProfileImageChooser(onClick = {
+                                ProfileImageChooser {
                                     scope.launch {
                                         val file = Utils.chooseImage()
                                         if (file != null) {
@@ -143,7 +101,7 @@ fun Demo() {
                                         }
                                     }
                                     showImage = false
-                                })
+                                }
                             }
                         }
                     }
@@ -175,18 +133,6 @@ fun Main() {
         modifier = Modifier.fillMaxSize()
     )
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 enum class ScreenNavRail(val title: String) {
