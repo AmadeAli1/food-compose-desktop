@@ -12,7 +12,7 @@ fun main() = application {
 
     val state = rememberWindowState(
         position = WindowPosition(Alignment.Center),
-        placement = WindowPlacement.Floating
+        placement = WindowPlacement.Fullscreen
     )
 
     val page = remember { mutableStateOf(Screen.Login) }
@@ -26,14 +26,13 @@ fun main() = application {
         MaterialTheme {
             when (page.value) {
                 Screen.Home -> Demo()
-                Screen.Login -> LoginView {
+                Screen.Login -> LoginView{
                     page.value = it
                 }
                 Screen.Register -> RegisterView {
                     page.value = it
                 }
             }
-
         }
     }
 
