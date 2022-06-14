@@ -1,18 +1,24 @@
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
-import views.*
+import views.Demo
+import views.LoginView
+import views.RegisterView
+import views.Screen
 
 fun main() = application {
 
     val state = rememberWindowState(
         position = WindowPosition(Alignment.Center),
-        placement = WindowPlacement.Fullscreen
+        placement = WindowPlacement.Floating
     )
 
     val page = remember { mutableStateOf(Screen.Login) }
@@ -25,8 +31,8 @@ fun main() = application {
     ) {
         MaterialTheme {
             when (page.value) {
-                Screen.Home -> Demo()
-                Screen.Login -> LoginView{
+                Screen.Home -> Demo(state)
+                Screen.Login -> LoginView {
                     page.value = it
                 }
                 Screen.Register -> RegisterView {

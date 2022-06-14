@@ -8,9 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BrokenImage
-import androidx.compose.material.icons.outlined.AttachFile
-import androidx.compose.material.icons.outlined.Category
-import androidx.compose.material.icons.outlined.Save
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,7 +34,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.Image
 import repository.CategoriaRepository
-import theme.White
 import theme.lightPalete
 import utils.Utils
 import java.awt.Cursor
@@ -223,11 +220,11 @@ private fun SaveForm(repository: CategoriaRepository) {
                         }
                     }
                 },
-                colors = ButtonDefaults.outlinedButtonColors(backgroundColor = White),
+                //colors = ButtonDefaults.outlinedButtonColors(backgroundColor = White),
                 modifier = Modifier.weight(3f).height(50.dp)
                     .pointerHoverIcon(icon = PointerIcon(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)))
             ) {
-                Text(text = "Attach File")
+                Text(text = "Imagem")
                 Spacer(modifier = Modifier.padding(horizontal = 8.dp))
                 Icon(imageVector = Icons.Outlined.AttachFile, null)
             }

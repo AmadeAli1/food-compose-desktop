@@ -21,6 +21,7 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.WindowState
 import components.loadNetworkImage
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -30,7 +31,7 @@ import utils.Utils
 import java.awt.Cursor
 
 @Composable
-fun Demo() {
+fun Demo(state: WindowState) {
     var navRailVisible by remember { mutableStateOf(false) }
     val navRailSelected = remember { mutableStateOf(0) }
     var currentScreen by remember { mutableStateOf(ScreenNavRail.MAIN) }
@@ -38,6 +39,7 @@ fun Demo() {
     val repository = UserRepository.getINSTANCE()!!
     var showImage by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+
     val image = remember { mutableStateOf(ImageBitmap(1, 1)) }
 
     if (repository.currentUser.value.profileUrl != null) {
@@ -65,6 +67,7 @@ fun Demo() {
             ) {
                 Row {
                     if (navRailVisible) {
+
                         NavigationRail(
                             modifier = Modifier.width(120.dp).fillMaxHeight().weight(1f),
                             backgroundColor = MaterialTheme.colors.primary,
@@ -155,7 +158,10 @@ private fun items() = listOf(
 )
 
 @Composable
-private fun NavRailItems(selected: MutableState<Int>, onNavClick: (ScreenNavRail) -> Unit) {
+private fun NavRailItems(
+    selected: MutableState<Int>,
+    onNavClick: (ScreenNavRail) -> Unit,
+) {
     items().forEachIndexed { index, item ->
         NavigationRailItem(
             selected = selected.value == index,
@@ -168,7 +174,9 @@ private fun NavRailItems(selected: MutableState<Int>, onNavClick: (ScreenNavRail
                     imageVector = item.icon, contentDescription = null
                 )
             },
-            label = { Text(text = item.screenNavRail.title) },
+            label = {
+                Text(text = item.screenNavRail.title)
+            },
             alwaysShowLabel = true,
             selectedContentColor = Color.White
         )
