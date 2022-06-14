@@ -32,7 +32,7 @@ fun RegisterView(onChangeScreen: (Screen) -> Unit) {
     val username = remember { mutableStateOf("") }
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
-    val repository = remember { mutableStateOf(UserRepository.getINSTANCE()!!) }.value
+    val repository = UserRepository.getINSTANCE()!!
     val validation = repository.validateForm
     val scope = rememberCoroutineScope()
 
@@ -50,7 +50,6 @@ fun RegisterView(onChangeScreen: (Screen) -> Unit) {
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-
                     Icon(
                         imageVector = Icons.Default.AccountCircle,
                         contentDescription = null,

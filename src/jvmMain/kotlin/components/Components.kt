@@ -1,9 +1,11 @@
 package components
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.VerticalScrollbar
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -72,7 +74,6 @@ fun ButtonForm(
     color: Color = Color.DarkGray,
     onClick: () -> Unit,
 ) {
-
     Button(
         onClick = { onClick() },
         modifier = Modifier.pointerHoverIcon(icon = PointerIcon(cursor = Cursor(Cursor.HAND_CURSOR)))
@@ -83,5 +84,20 @@ fun ButtonForm(
         Text(
             text, textAlign = TextAlign.Center, color = Color.White, fontWeight = FontWeight.SemiBold
         )
+    }
+}
+
+@Composable
+fun ScrollableColumn(content: @Composable () -> Unit) {
+    val scrollState = rememberScrollState(0)
+    val adapter = rememberScrollbarAdapter(scrollState)
+    Box(modifier = Modifier.fillMaxSize().padding(8.dp)) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(5.dp),
+            modifier = Modifier.verticalScroll(scrollState).padding(bottom = 16.dp)
+        ) {
+            content()
+        }
+        VerticalScrollbar(adapter = adapter, modifier = Modifier.fillMaxHeight().align(Alignment.TopEnd))
     }
 }

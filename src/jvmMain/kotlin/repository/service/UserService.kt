@@ -1,4 +1,4 @@
-package repository
+package repository.service
 
 import model.UserRegisterForm
 import model.Usuario
@@ -18,5 +18,6 @@ interface UserService {
     @Headers("Accept: application/json")
     @POST("user/register")
     suspend fun signup(@Body user: UserRegisterForm): Response<Usuario>
+
 
 }

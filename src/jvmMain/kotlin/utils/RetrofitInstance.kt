@@ -13,7 +13,7 @@ class RetrofitInstance {
         private var INSTANCE: Retrofit? = null
 
         @Synchronized
-        fun getINSTANCE(): Retrofit? {
+        fun getInstance(): Retrofit? {
             if (INSTANCE == null) {
                 INSTANCE = Retrofit.Builder().baseUrl(BASE_URL)
                     .client(

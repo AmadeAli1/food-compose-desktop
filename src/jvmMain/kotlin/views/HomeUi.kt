@@ -8,10 +8,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material.icons.outlined.PersonOutline
-import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,8 +21,10 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import components.ScrollableColumn
 import components.UserCard
 import components.loadNetworkImage
 import kotlinx.coroutines.async
@@ -32,6 +32,7 @@ import kotlinx.coroutines.launch
 import model.Usuario
 import repository.UserRepository
 import theme.lightPalete
+import utils.Utils
 import java.awt.Cursor
 
 @Composable
@@ -44,7 +45,7 @@ fun HomeView(repository: UserRepository = UserRepository.getINSTANCE()!!) {
 
     scope.launch {
         val users = repository.users()
-        list.addAll(users!!)
+        //list.addAll(users!!)
     }
 
     Surface(modifier = Modifier.fillMaxSize()) {
@@ -89,7 +90,6 @@ fun Demo() {
             image.value = loadImage.await().value
         }
     }
-
     MaterialTheme(colors = lightPalete) {
         Scaffold(
             topBar = {
@@ -124,21 +124,26 @@ fun Demo() {
                             ScreenNavRail.MAIN -> Main()
                             ScreenNavRail.USERS -> Users()
                             ScreenNavRail.PRODUCTS -> Main()
+                            ScreenNavRail.CATEGORIES -> CategoryView()
                         }
                         if (showImage) {
                             Surface(
                                 elevation = 5.dp,
-                                shape=CircleShape,
+                                shape = CircleShape,
                                 modifier = Modifier.align(Alignment.Center)
                             ) {
-                                Image(
-                                    bitmap = image.value,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(150.dp).clickable {
-                                        showImage = false
-                                    }.clip(CircleShape),
-                                    contentScale = ContentScale.Crop
-                                )
+                                ProfileImageChooser(onClick = {
+                                    scope.launch {
+                                        val file = Utils.chooseImage()
+                                        if (file != null) {
+                                            repository.saveProfile(
+                                                id = repository.currentUser.value.uid,
+                                                file = file
+                                            )
+                                        }
+                                    }
+                                    showImage = false
+                                })
                             }
                         }
                     }
@@ -149,98 +154,46 @@ fun Demo() {
 }
 
 @Composable
+private fun ProfileImageChooser(onClick: () -> Unit) {
+    Surface(color = Color(0xFFcb9b8c)) {
+        Image(
+            imageVector = Icons.Filled.PhotoCamera,
+            contentDescription = null,
+            modifier = Modifier.padding(16.dp)
+                .size(150.dp)
+                .clip(CircleShape)
+                .clickable {
+                    onClick()
+                }
+        )
+    }
+}
+
+@Composable
 fun Main() {
     Box(
         modifier = Modifier.fillMaxSize()
     )
 }
 
-@Composable
-fun Users() {
-    val users = remember { mutableStateListOf<Usuario>() }
-    val repository = UserRepository.getINSTANCE()!!
-    LaunchedEffect(true) {
-        users.addAll(repository.users()!!)
-    }
 
-    ScrollableColumn {
-        users.forEach {
-            SampleCard(it)
-        }
-    }
 
-}
+
+
+
+
+
+
+
+
+
+
 
 enum class ScreenNavRail(val title: String) {
     USERS("Users"),
     PRODUCTS("Products"),
+    CATEGORIES("Categories"),
     MAIN("Home")
-}
-
-@Composable
-fun SampleCard(user: Usuario) {
-    Surface(
-        elevation = 2.dp,
-        color = MaterialTheme.colors.primary,
-        modifier = Modifier.height(56.dp), shape = RoundedCornerShape(8)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth().padding(start = 8.dp, end = 8.dp)
-        ) {
-            Text(
-                text = user.username,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.body1
-            )
-            Text(
-                text = user.email,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.body1
-            )
-
-            Text(
-                text = user.isEnable.toString(),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.body1
-            )
-
-        }
-    }
-}
-
-@Composable
-private fun ScrollableColumn(content: @Composable () -> Unit) {
-    val scrollState = rememberScrollState(0)
-    val adapter = rememberScrollbarAdapter(scrollState)
-    Box(modifier = Modifier.fillMaxSize().padding(8.dp)) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(5.dp),
-            modifier = Modifier.verticalScroll(scrollState)
-        ) {
-            content()
-        }
-        VerticalScrollbar(adapter = adapter, modifier = Modifier.fillMaxHeight().align(Alignment.TopEnd))
-    }
-}
-
-
-@Composable
-fun RowScope.TableCell(
-    text: String,
-    weight: Float,
-) {
-    Text(
-        text = text,
-        Modifier
-            .border(1.dp, Color.Black)
-            .weight(weight)
-            .padding(8.dp)
-    )
 }
 
 data class NavItems(
@@ -251,7 +204,8 @@ data class NavItems(
 private fun items() = listOf(
     NavItems(Icons.Outlined.Home, ScreenNavRail.MAIN),
     NavItems(Icons.Outlined.ShoppingCart, ScreenNavRail.PRODUCTS),
-    NavItems(Icons.Outlined.PersonOutline, ScreenNavRail.USERS)
+    NavItems(Icons.Outlined.PersonOutline, ScreenNavRail.USERS),
+    NavItems(Icons.Outlined.Category, ScreenNavRail.CATEGORIES)
 )
 
 @Composable
