@@ -34,12 +34,13 @@ class CategoriaRepository private constructor(
 
     private suspend fun getAll() {
         val response = service.findAll()
-        println("Here")
         if (response.isSuccessful) {
             val body = response.body()
             body?.forEach {
                 categorias["${it.id}"] = it
             }
+        }else{
+            println(response.message())
         }
     }
 

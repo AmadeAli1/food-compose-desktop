@@ -32,6 +32,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import model.Usuario
 import org.jetbrains.skia.Image
+import views.loadPicture
 import java.io.ByteArrayOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
@@ -43,7 +44,7 @@ fun UserCard(modifier: Modifier = Modifier, usuario: Usuario) {
     val scope = rememberCoroutineScope()
     val image = remember { mutableStateOf(ImageBitmap(1, 1)) }
     val loadImage = scope.async {
-        mutableStateOf(loadNetworkImage(usuario.profileUrl!!))
+        mutableStateOf(loadPicture(usuario.profileUrl!!))
     }
     scope.launch {
         image.value = loadImage.await().value

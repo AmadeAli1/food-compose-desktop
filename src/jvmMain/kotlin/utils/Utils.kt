@@ -38,6 +38,29 @@ object Utils {
         return null
     }
 
+
+    fun chooseMultipleImages(): List<File>? {
+        val chooser = JFileChooser()
+        chooser.dialogTitle = "Imagem Para Categoria"
+        val filter = FileNameExtensionFilter(
+            "JPG & PNG Images", "jpg", "png"
+        )
+        chooser.fileFilter = filter
+        chooser.isMultiSelectionEnabled = true
+        val returnVal = chooser.showOpenDialog(Container())
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            println(
+                "Accept"
+            )
+            if (chooser.selectedFiles.isEmpty()) {
+                return null
+            }
+            return chooser.selectedFiles.toList()
+        }
+        return null
+    }
+
+
     fun <T> convert(clazz: KClass<*>, response: String): T {
         return Gson().fromJson<T>(
             response, clazz.java

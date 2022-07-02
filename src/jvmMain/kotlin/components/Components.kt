@@ -2,6 +2,8 @@ package components
 
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -100,4 +102,22 @@ fun ScrollableColumn(content: @Composable () -> Unit) {
         }
         VerticalScrollbar(adapter = adapter, modifier = Modifier.fillMaxHeight().align(Alignment.TopEnd))
     }
+}
+
+
+@Composable
+fun ScrollableLazylist(content: @Composable (LazyListState) -> Unit) {
+    Box(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        val state = rememberLazyListState()
+        content(state)
+        VerticalScrollbar(
+            modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+            adapter = rememberScrollbarAdapter(
+                scrollState = state
+            )
+        )
+    }
+
 }

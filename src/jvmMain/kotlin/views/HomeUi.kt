@@ -26,8 +26,8 @@ import components.loadNetworkImage
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import repository.UserRepository
-import theme.lightPalete
 import utils.Utils
+import views.ui.ProdutoContainer
 import java.awt.Cursor
 
 @Composable
@@ -50,61 +50,59 @@ fun Demo(state: WindowState) {
             image.value = loadImage.await().value
         }
     }
-    MaterialTheme(colors = lightPalete) {
-        Scaffold(
-            topBar = {
-                Toolbar(title = repository.currentUser.value.username, image = image, onNavClick = {
-                    navRailVisible = !navRailVisible
-                }, onProfileClick = {
-                    showImage = !showImage
-                })
-            },
-            scaffoldState = scaffoldState
-        ) { paddingValues ->
-            Surface(
-                modifier = Modifier.padding(paddingValues).fillMaxSize(),
-                color = MaterialTheme.colors.background
-            ) {
-                Row {
-                    if (navRailVisible) {
+    Scaffold(
+        topBar = {
+            Toolbar(title = repository.currentUser.value.username, image = image, onNavClick = {
+                navRailVisible = !navRailVisible
+            }, onProfileClick = {
+                showImage = !showImage
+            })
+        },
+        scaffoldState = scaffoldState
+    ) { paddingValues ->
+        Surface(
+            modifier = Modifier.padding(paddingValues).fillMaxSize(),
+            color = MaterialTheme.colors.background
+        ) {
+            Row {
+                if (navRailVisible) {
 
-                        NavigationRail(
-                            modifier = Modifier.width(120.dp).fillMaxHeight().weight(1f),
-                            backgroundColor = MaterialTheme.colors.primary,
-                            elevation = 2.dp
-                        ) {
-                            NavRailItems(selected = navRailSelected) {
-                                currentScreen = it
-                            }
+                    NavigationRail(
+                        modifier = Modifier.width(120.dp).fillMaxHeight().weight(1f),
+                        backgroundColor = MaterialTheme.colors.primary,
+                        elevation = 2.dp
+                    ) {
+                        NavRailItems(selected = navRailSelected) {
+                            currentScreen = it
                         }
                     }
-                    Box(
-                        modifier = Modifier.fillMaxSize().weight(10f)
-                    ) {
-                        when (currentScreen) {
-                            ScreenNavRail.MAIN -> Main()
-                            ScreenNavRail.USERS -> Users()
-                            ScreenNavRail.PRODUCTS -> Main()
-                            ScreenNavRail.CATEGORIES -> CategoryView()
-                        }
-                        if (showImage) {
-                            Surface(
-                                elevation = 5.dp,
-                                shape = CircleShape,
-                                modifier = Modifier.align(Alignment.Center)
-                            ) {
-                                ProfileImageChooser {
-                                    scope.launch {
-                                        val file = Utils.chooseImage()
-                                        if (file != null) {
-                                            repository.saveProfile(
-                                                id = repository.currentUser.value.uid,
-                                                file = file
-                                            )
-                                        }
+                }
+                Box(
+                    modifier = Modifier.fillMaxSize().weight(10f)
+                ) {
+                    when (currentScreen) {
+                        ScreenNavRail.MAIN -> Main()
+                        ScreenNavRail.USERS -> Users()
+                        ScreenNavRail.PRODUCTS -> ProdutoContainer()
+                        ScreenNavRail.CATEGORIES -> CategoryView()
+                    }
+                    if (showImage) {
+                        Surface(
+                            elevation = 5.dp,
+                            shape = CircleShape,
+                            modifier = Modifier.align(Alignment.Center)
+                        ) {
+                            ProfileImageChooser {
+                                scope.launch {
+                                    val file = Utils.chooseImage()
+                                    if (file != null) {
+                                        repository.saveProfile(
+                                            id = repository.currentUser.value.uid,
+                                            file = file
+                                        )
                                     }
-                                    showImage = false
                                 }
+                                showImage = false
                             }
                         }
                     }
@@ -112,6 +110,7 @@ fun Demo(state: WindowState) {
             }
         }
     }
+
 }
 
 @Composable
@@ -134,7 +133,7 @@ private fun ProfileImageChooser(onClick: () -> Unit) {
 fun Main() {
     Box(
         modifier = Modifier.fillMaxSize()
-    )
+    ) {}
 }
 
 
@@ -183,7 +182,6 @@ private fun NavRailItems(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun Toolbar(
     title: String, image: MutableState<ImageBitmap>,

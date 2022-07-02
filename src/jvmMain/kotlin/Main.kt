@@ -9,16 +9,15 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
-import views.Demo
-import views.LoginView
-import views.RegisterView
-import views.Screen
+import views.*
+import views.ui.ProdutoContainer
+import views.ui.SectionOne
 
 fun main() = application {
 
     val state = rememberWindowState(
         position = WindowPosition(Alignment.Center),
-        placement = WindowPlacement.Floating
+        placement = WindowPlacement.Maximized
     )
 
     val page = remember { mutableStateOf(Screen.Login) }
@@ -27,6 +26,7 @@ fun main() = application {
         title = "Food Market",
         icon = rememberVectorPainter(image = Icons.Default.AccountCircle),
         state = state,
+        resizable = false,
         onCloseRequest = ::exitApplication
     ) {
         MaterialTheme {

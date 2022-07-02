@@ -1,8 +1,12 @@
 package repository
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import model.request.ProdutoRequest
 import model.response.ProdutoResponse
@@ -16,12 +20,30 @@ import utils.Utils.BASE_URL
 import utils.Utils.Client
 import utils.Utils.convert
 import java.io.File
-import kotlin.reflect.KClass
 
 class ProdutoRepository private constructor(
     private val service: ProdutoService,
 ) {
     val produtos = mutableStateMapOf<String, ProdutoResponse>()
+    val pageItems = mutableStateListOf<ProdutoResponse>()
+    val totalPages = mutableStateOf(-1)
+
+    init {
+        val scope = CoroutineScope(Dispatchers.IO)
+        scope.launch {
+            pagination()
+        }
+    }
+
+    suspend fun pagination(pageIndex: Int = 0) = withContext(Dispatchers.IO) {
+        val response = service.page(page = pageIndex)
+        if (response.isSuccessful) {
+            val value = response.body()!!
+            totalPages.value = value.totalPages
+            pageItems.clear();
+            pageItems.addAll(value.data)
+        }
+    }
 
 
     suspend fun getAll() = withContext(Dispatchers.IO) {
@@ -53,10 +75,12 @@ class ProdutoRepository private constructor(
             val json = response.body()!!.string()
             val result = convert<ProdutoResponse?>(ProdutoResponse::class, json)
             println(result!!)
-            //produtos["${result.produto.id}"] = result
+            produtos["${result.produto.id}"] = result
+            return@withContext true
         } else {
             println(response.message())
         }
+        false
     }
 
     private fun addFile(file: File, form: MultipartBody.Builder) {
